@@ -61,14 +61,14 @@ export default function WeatherDetails({ data }: WeatherDetailsProps) {
   const details = [
     {
       icon: (
-        <Feather name="droplet" size={24} color={COLORS.textPrimary} />
+        <Feather name="droplet" size={18} color={COLORS.textPrimary} />
       ),
       label: t('uk').humidity,
       value: `${data.main.humidity}%`,
     },
     {
       icon: (
-        <Feather name="wind" size={24} color={COLORS.textPrimary} />
+        <Feather name="wind" size={18} color={COLORS.textPrimary} />
       ),
       label: t('uk').wind,
       value: `${data.wind.speed} ${t('uk').windUnit}`,
@@ -77,7 +77,7 @@ export default function WeatherDetails({ data }: WeatherDetailsProps) {
       icon: (
         <MaterialCommunityIcons
           name="gauge"
-          size={24}
+          size={18}
           color={COLORS.textPrimary}
         />
       ),
@@ -86,7 +86,7 @@ export default function WeatherDetails({ data }: WeatherDetailsProps) {
     },
     {
       icon: (
-        <Feather name="eye" size={24} color={COLORS.textPrimary} />
+        <Feather name="eye" size={18} color={COLORS.textPrimary} />
       ),
       label: t('uk').visibility,
       value: `${(data.visibility / 1000).toFixed(1)} ${t('uk').visibilityUnit}`,
@@ -113,40 +113,40 @@ export default function WeatherDetails({ data }: WeatherDetailsProps) {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: SPACING.lg,
-    marginTop: SPACING.lg,
+    marginTop: SPACING.md,
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: SPACING.md,
-  },
-  detailItem: {
-    width: '47%',
-    backgroundColor: COLORS.cardBackground,
-    borderRadius: BORDER_RADIUS.lg,
-    borderWidth: 1,
-    borderColor: COLORS.inputBorder,
-    paddingVertical: SPACING.lg,
-    paddingHorizontal: SPACING.md,
-    alignItems: 'center',
     gap: SPACING.sm,
   },
+  detailItem: {
+    width: '48%',
+    backgroundColor: COLORS.cardBackground,
+    borderRadius: BORDER_RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.inputBorder,
+    paddingVertical: 12,
+    paddingHorizontal: SPACING.sm,
+    alignItems: 'center',
+    gap: 4,
+  },
   iconWrapper: {
-    width: 48,
-    height: 48,
+    width: 36,
+    height: 36,
     borderRadius: BORDER_RADIUS.round,
     backgroundColor: COLORS.whiteTransparent,
     alignItems: 'center',
     justifyContent: 'center',
   },
   detailValue: {
-    fontSize: FONT_SIZES.xl,
+    fontSize: FONT_SIZES.md,
     fontWeight: '700',
     color: COLORS.textPrimary,
   },
   detailLabel: {
-    fontSize: FONT_SIZES.sm,
+    fontSize: FONT_SIZES.xs,
     color: COLORS.textSecondary,
     fontWeight: '500',
   },

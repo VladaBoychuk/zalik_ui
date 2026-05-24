@@ -90,18 +90,18 @@ export default function App() {
       <SafeAreaView style={styles.safeArea}>
         <KeyboardAvoidingView
           style={styles.flex}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-          <Pressable
-            style={styles.flex}
-            onPress={() => {
-              if (Platform.OS !== 'web') Keyboard.dismiss();
-            }}
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={true}
           >
-            <ScrollView
-              contentContainerStyle={styles.scrollContent}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
+            <Pressable
+              style={styles.pressableContent}
+              onPress={() => {
+                if (Platform.OS !== 'web') Keyboard.dismiss();
+              }}
             >
               <View style={styles.header}>
                 <View style={styles.headerTitleRow}>
@@ -152,8 +152,8 @@ export default function App() {
                   </Text>
                 </View>
               )}
-            </ScrollView>
-          </Pressable>
+            </Pressable>
+          </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
     </LinearGradient>
@@ -173,15 +173,18 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingBottom: SPACING.xxl,
+  },
+  pressableContent: {
+    flexGrow: 1,
+    paddingBottom: SPACING.md,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.lg,
-    paddingBottom: SPACING.md,
+    paddingTop: SPACING.md,
+    paddingBottom: 4,
   },
   headerTitleRow: {
     flexDirection: 'row',
@@ -217,8 +220,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: SPACING.xxl * 2,
-    gap: SPACING.md,
+    paddingVertical: SPACING.xl,
+    gap: SPACING.sm,
   },
   placeholderTitle: {
     fontSize: FONT_SIZES.xxl,
