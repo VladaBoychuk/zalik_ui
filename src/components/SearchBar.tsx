@@ -11,6 +11,7 @@ import { Feather } from '@expo/vector-icons';
 import { COLORS, BORDER_RADIUS, FONT_SIZES, SPACING } from '../constants/theme';
 import { fetchCombinedSuggestions } from '../services/weatherApi';
 import { GeoLocation } from '../types/weather';
+import { translateCountry } from '../constants/i18n';
 
 interface SearchBarProps {
   value: string;
@@ -66,20 +67,24 @@ export default function SearchBar({
   }, [value]);
 
   const handleSelectCity = useCallback((city: GeoLocation) => {
-    const displayName = city.name;
+    const isCyrillic = /[\u0400-\u04FF]/.test(value);
+    const displayName = isCyrillic ? (city.local_names?.uk || city.name) : (city.local_names?.en || city.name);
     isSelectionChange.current = true;
     onChangeText(displayName);
     setShowSuggestions(false);
     setSuggestions([]);
     onSearch(displayName, city);
-  }, [onChangeText, onSearch]);
+  }, [value, onChangeText, onSearch]);
 
   const formatCityLabel = (city: GeoLocation): string => {
-    const parts = [city.name];
+    const isCyrillic = /[\u0400-\u04FF]/.test(value);
+    const lang = isCyrillic ? 'uk' : 'en';
+    const cityName = isCyrillic ? (city.local_names?.uk || city.name) : (city.local_names?.en || city.name);
+    const parts = [cityName];
     if (city.state) {
       parts.push(city.state);
     }
-    parts.push(city.country);
+    parts.push(translateCountry(city.country, lang));
     return parts.join(', ');
   };
 

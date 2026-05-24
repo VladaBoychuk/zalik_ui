@@ -15,11 +15,23 @@ function normalizeString(str: string): string {
     .trim();
 }
 
+function transliterateCyrillic(str: string): string {
+  const map: Record<string, string> = {
+    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'h', 'ґ': 'g', 'д': 'd', 'е': 'e', 'є': 'ye',
+    'ж': 'zh', 'з': 'z', 'и': 'y', 'і': 'i', 'ї': 'yi', 'й': 'y', 'к': 'k', 'л': 'l',
+    'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+    'ф': 'f', 'х': 'kh', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'shch', 'ь': '',
+    'ю': 'yu', 'я': 'ya', 'э': 'e', 'ы': 'y', 'ё': 'yo', 'ъ': ''
+  };
+  return str.split('').map(char => map[char] || char).join('');
+}
+
 export async function fetchCombinedSuggestions(query: string): Promise<GeoLocation[]> {
   const queryTrimmed = query.trim();
   if (queryTrimmed.length < 2) return [];
 
   const queryNorm = normalizeString(queryTrimmed);
+  const queryTranslit = transliterateCyrillic(queryNorm);
   const owmResults = await fetchOWMSuggestions(queryTrimmed);
   const merged: GeoLocation[] = [];
 
@@ -34,8 +46,16 @@ export async function fetchCombinedSuggestions(query: string): Promise<GeoLocati
   };
 
   owmResults.forEach(item => {
-    const defaultNameNorm = normalizeString(item.name);
-    if (defaultNameNorm.startsWith(queryNorm)) {
+    const namesToCheck = [item.name];
+    if (item.local_names?.uk) namesToCheck.push(item.local_names.uk);
+    if (item.local_names?.en) namesToCheck.push(item.local_names.en);
+
+    const matches = namesToCheck.some(name => {
+      const normalized = normalizeString(name);
+      return normalized.startsWith(queryNorm) || normalized.startsWith(queryTranslit);
+    });
+
+    if (matches) {
       addIfUnique(item);
     }
   });

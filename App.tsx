@@ -18,7 +18,7 @@ import SearchBar from './src/components/SearchBar';
 import WeatherCard from './src/components/WeatherCard';
 import WeatherDetails from './src/components/WeatherDetails';
 import LoadingSpinner from './src/components/LoadingSpinner';
-import { fetchWeatherByCity, fetchWeatherByCoords } from './src/services/weatherApi';
+import { fetchWeatherByCity, fetchWeatherByCoords, fetchCombinedSuggestions } from './src/services/weatherApi';
 import { getGradientColors, COLORS, FONT_SIZES, SPACING } from './src/constants/theme';
 import { WeatherData, GeoLocation } from './src/types/weather';
 import { t } from './src/constants/i18n';
@@ -31,47 +31,46 @@ export default function App() {
   const [lastSearchedCity, setLastSearchedCity] = useState<GeoLocation | null>(null);
 
   const handleSearch = useCallback(async (cityName?: string, cityDetails?: GeoLocation) => {
-    let trimmedCity = '';
-    let coords: { lat: number; lon: number } | null = null;
-    
-    if (cityDetails) {
-      coords = { lat: cityDetails.lat, lon: cityDetails.lon };
-      trimmedCity = cityDetails.name;
-    } else {
-      trimmedCity = (cityName || city).trim();
-    }
-    
-    if (!trimmedCity) return;
+    const searchString = (cityName || city).trim();
+    if (!searchString) return;
+
+    const isCyrillic = /[\u0400-\u04FF]/.test(searchString);
 
     Keyboard.dismiss();
     setLoading(true);
     setError(null);
 
     try {
+      let details = cityDetails;
+      if (!details) {
+        const suggestions = await fetchCombinedSuggestions(searchString);
+        if (suggestions.length > 0) {
+          details = suggestions[0];
+        }
+      }
+
       let data: WeatherData;
-      if (coords) {
-        data = await fetchWeatherByCoords(coords.lat, coords.lon, 'uk');
+      const apiLang = 'uk';
+
+      if (details) {
+        data = await fetchWeatherByCoords(details.lat, details.lon, apiLang);
+        const resolvedName = isCyrillic ? (details.local_names?.uk || details.name) : (details.local_names?.en || details.name);
+        data.name = resolvedName;
+        setLastSearchedCity(details);
+        setCity(resolvedName);
       } else {
-        data = await fetchWeatherByCity(trimmedCity, 'uk');
-      }
-      
-      if (cityDetails) {
-        data.name = trimmedCity;
-      }
-      
-      setWeatherData(data);
-      
-      if (cityDetails) {
-        setLastSearchedCity(cityDetails);
-      } else {
+        data = await fetchWeatherByCity(searchString, apiLang);
+        data.name = searchString;
         setLastSearchedCity({
           name: data.name,
           lat: data.coord.lat,
           lon: data.coord.lon,
           country: data.sys.country,
         });
+        setCity(searchString);
       }
-      setCity(cityDetails ? trimmedCity : data.name);
+      
+      setWeatherData(data);
     } catch (err: any) {
       const errorCode = err.message;
       const translations = t('uk');

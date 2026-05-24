@@ -9,7 +9,7 @@ import {
 import { WeatherData, GeoLocation } from '../types/weather';
 import { getWeatherIconUrl } from '../services/weatherApi';
 import { COLORS, BORDER_RADIUS, FONT_SIZES, SPACING } from '../constants/theme';
-import { t } from '../constants/i18n';
+import { t, translateCountry } from '../constants/i18n';
 
 interface WeatherCardProps {
   data: WeatherData;
@@ -43,17 +43,20 @@ export default function WeatherCard({ data, locationDetails }: WeatherCardProps)
     data.weather[0]?.description?.slice(1);
   const iconUrl = getWeatherIconUrl(data.weather[0]?.icon);
 
-  const cityTitle = locationDetails ? locationDetails.name : data.name;
+  const cityTitle = data.name;
 
   const citySub = (() => {
+    const isCyrillic = /[\u0400-\u04FF]/.test(cityTitle);
+    const lang = isCyrillic ? 'uk' : 'en';
     const countryCode = locationDetails ? locationDetails.country : data.sys.country;
-    if (!locationDetails) return countryCode;
+    const translatedCountry = translateCountry(countryCode, lang);
+    if (!locationDetails) return translatedCountry;
     
     const parts = [];
     if (locationDetails.state) {
       parts.push(locationDetails.state);
     }
-    parts.push(countryCode);
+    parts.push(translatedCountry);
     return parts.join(', ');
   })();
 

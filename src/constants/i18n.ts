@@ -1,8 +1,8 @@
 const uk = {
   appTitle: 'Погода',
-  searchPlaceholder: 'Введіть назву міста англійською...',
+  searchPlaceholder: 'Введіть назву міста...',
   loading: 'Завантаження...',
-  feelsLike: 'Відчувається як',
+  feelsLike: 'Відчується як',
   humidity: 'Вологість',
   wind: 'Вітер',
   pressure: 'Тиск',
@@ -11,7 +11,7 @@ const uk = {
   pressureUnit: 'гПа',
   visibilityUnit: 'км',
   searchHintTitle: 'Дізнайтесь погоду',
-  searchHintText: 'Введіть назву міста англійською\nдля пошуку поточної погоди',
+  searchHintText: 'Введіть назву міста\nдля пошуку поточної погоди',
   cityNotFound: 'Місто не знайдено. Перевірте назву та спробуйте ще раз.',
   invalidApiKey: 'Невірний API ключ. Перевірте налаштування.',
   networkError: 'Помилка мережі. Перевірте підключення до інтернету.',
@@ -20,4 +20,13 @@ const uk = {
 
 export function t(lang?: string) {
   return uk;
+}
+
+export function translateCountry(countryCode: string, lang: string): string {
+  try {
+    const names = new Intl.DisplayNames([lang], { type: 'region' });
+    return names.of(countryCode.toUpperCase()) || countryCode;
+  } catch {
+    return countryCode;
+  }
 }
