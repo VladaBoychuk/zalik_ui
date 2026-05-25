@@ -22,12 +22,15 @@ export function t(lang?: string) {
   return uk;
 }
 
-export function translateCountry(countryCode: string, lang: string): string {
+export function translateCountry(countryCode: string, lang: string = 'uk'): string {
   const code = countryCode.toUpperCase();
   try {
+    // Uses global Intl.DisplayNames, which is polyfilled via src/polyfillSetup.ts
+    // imported at the very top of index.ts.
     const names = new Intl.DisplayNames([lang], { type: 'region' });
     return names.of(code) || countryCode;
-  } catch {
+  } catch (error) {
+    console.error('Error translating country via Intl.DisplayNames:', error);
     return countryCode;
   }
 }
